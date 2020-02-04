@@ -8,10 +8,10 @@ defmodule FileServer.Operations do
   def process({:folder, path, files}, _) do
     files
     |> Enum.map(&(Task.async(fn -> process(&1, path) end)))
-    |> Enum.map(&(Task.await(&1)))
+    |> Enum.map(&(Task.await(&1, 10_000)))
   end
-  def process({:file, file_path}, path) do
+  def process({:file, file_path, filename}, folder) do
     # Hash and store
-    file_path
+    %{filename: filename, hash: FileServer.hash_file(file_path), folder: folder}
   end
 end
