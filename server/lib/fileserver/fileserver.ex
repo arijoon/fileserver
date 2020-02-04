@@ -6,15 +6,15 @@ defmodule FileServer do
     |> crawl_sub(path)
   end
 
-  def crawl_sub({:ok, files}, path) do
+  defp crawl_sub({:ok, files}, path) do
     {:folder, path, files |> Enum.map(&(Path.join(path, &1) |> crawl()))}
   end
 
-  def crawl_sub({:error, _}, path) do
+  defp crawl_sub({:error, _}, path) do
     {:file, path}
   end
 
-  defp from_root(path) do
+  def from_root(path) do
     Path.join(@root_path, path)
   end
 end
