@@ -26,4 +26,15 @@ defmodule FileServer do
   def from_root(path) do
     Path.join(@root_path, path)
   end
+
+  def last_modified(path) do
+    {:ok, stat} = from_root(path)
+    |> File.stat()
+
+    stat.mtime |> to_datetime()
+  end
+  def to_datetime({{y, m, d}, {h, mm, ss}}) do
+    %DateTime{year: y, month: m, day: d, hour: h, minute: mm, second: ss,
+      utc_offset: 0, std_offset: 0, zone_abbr: "UTC", time_zone: "Etc/UTC"}
+  end
 end
