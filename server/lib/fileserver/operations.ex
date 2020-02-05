@@ -25,7 +25,7 @@ defmodule FileServer.Operations do
     |> Enum.map(fn chunk ->
       Task.async(fn ->
         chunk
-        |> Enum.map(fn item -> process(item) end)
+        |> Enum.map(&process/1)
       end)
     end)
     |> Enum.map(&Task.await(&1, 10_000))
