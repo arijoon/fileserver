@@ -11,19 +11,6 @@ defmodule Server.Items do
   @chunk_size 1_000
 
   @doc """
-  Returns the list of items.
-
-  ## Examples
-
-      iex> list_items()
-      [%Item{}, ...]
-
-  """
-  def list_items do
-    Repo.all(Item)
-  end
-
-  @doc """
   Gets a single item.
 
   Raises `Ecto.NoResultsError` if the Item does not exist.
@@ -50,6 +37,12 @@ defmodule Server.Items do
     Repo.all(q)
   end
 
+  def count_items(path) do
+    q = from i in filter_path(path),
+    select: { count(i.id) }
+    {count} = Repo.one(q)
+    count
+  end
   def user_contrib(path, limit \\ 5) do
     q = from i in filter_path(path),
     group_by: i.user,
@@ -70,7 +63,7 @@ defmodule Server.Items do
     items
      |> Stream.map(&(Item.changeset(%Item{}, &1)))
      |> Enum.chunk_every(@chunk_size)
-     |> Enum.each(fn chunk ->
+     |> Enum.map(fn chunk ->
         items_toadd = chunk
         |> Enum.map(&Server.RepoUtils.changeset_to_map/1)
         |> Enum.map(&Server.RepoUtils.add_timestamps/1)

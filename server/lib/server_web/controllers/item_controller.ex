@@ -2,42 +2,42 @@ defmodule ServerWeb.ItemController do
   use ServerWeb, :controller
 
   alias Server.Items
+  alias ServerWeb.ItemView
   alias Server.Items.Item
+  alias FileServer.Operations
 
   action_fallback ServerWeb.FallbackController
 
-  def index(conn, _params) do
-    items = Items.list_items()
-    render(conn, "index.json", items: items)
-  end
-
-  def create(conn, %{"item" => item_params}) do
-    with {:ok, %Item{} = item} <- Items.create_item(item_params) do
+  def create(conn, %{"path" => path, "filename" => filename, "folder" => folder}) do
+    with {:ok, %Item{} = item} <- Operations.new_file(path, filename, folder) do
       conn
       |> put_status(:created)
-      # |> put_resp_header("location", Routes.item_path(conn, :show, item))
       |> render("show.json", item: item)
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    item = Items.get_item!(id)
-    render(conn, "show.json", item: item)
+  def search(conn, %{"hash" => hash}) do
+    items = Items.get_by_hash(hash)
+    render(conn, "index.json", items: items)
   end
 
-  def update(conn, %{"id" => id, "item" => item_params}) do
-    item = Items.get_item!(id)
+  def stats(conn, %{"path" => path}) do
+    user_contrib = Items.user_contrib(path)
+    count = Items.count_items(path)
 
-    with {:ok, %Item{} = item} <- Items.update_item(item, item_params) do
-      render(conn, "show.json", item: item)
-    end
+    conn
+    |> put_view(ItemView)
+    |> render("stats.json", count: count, user_contrib: user_contrib)
   end
 
-  def delete(conn, %{"id" => id}) do
-    item = Items.get_item!(id)
+  def hash_dir(conn, %{"path" => path}) do
+    sanitize_path(path)
+    |> Operations.reset_dir()
 
-    with {:ok, %Item{}} <- Items.delete_item(item) do
-      send_resp(conn, :no_content, "")
-    end
+    send_resp(conn, :no_content, "")
+  end
+
+  defp sanitize_path(path) do
+    String.replace(path, "..", ".")
   end
 end
