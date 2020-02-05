@@ -51,9 +51,7 @@ defmodule Server.Items do
   end
 
   def user_contrib(path, limit \\ 5) do
-    like_seg = "#{path}/%"
-    q = from i in Item,
-    where: like(i.path, ^like_seg) or i.path == ^path,
+    q = from i in filter_path(path),
     group_by: i.user,
     select: {i.user, count(i.id)},
     order_by: [desc: count(i.id)],
@@ -62,18 +60,6 @@ defmodule Server.Items do
     Repo.all(q)
   end
 
-  @doc """
-  Creates a item.
-
-  ## Examples
-
-      iex> create_item(%{field: value})
-      {:ok, %Item{}}
-
-      iex> create_item(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
   def create_item(attrs \\ %{}) do
     %Item{}
     |> Item.changeset(attrs)
@@ -82,7 +68,7 @@ defmodule Server.Items do
 
   def add_all(items) do
     items
-     |> Enum.map(&(Item.changeset(%Item{}, &1)))
+     |> Stream.map(&(Item.changeset(%Item{}, &1)))
      |> Enum.chunk_every(@chunk_size)
      |> Enum.each(fn chunk ->
         items_toadd = chunk
@@ -131,10 +117,15 @@ defmodule Server.Items do
 
   def delete_all(""), do: Repo.delete_all(Item)
   def delete_all(path) do
-    like_seg = "#{path}/%"
-    query = from i in Item,
-    where: like(i.path, ^like_seg) or i.path == ^path
+    query = from i in filter_path(path)
     Repo.delete_all(query)
+  end
+
+  def filter_path(""), do: Item
+  def filter_path(path) do
+    like_seg = "#{path}/%"
+    from i in Item,
+    where: like(i.path, ^like_seg) or i.path == ^path
   end
 
   @doc """

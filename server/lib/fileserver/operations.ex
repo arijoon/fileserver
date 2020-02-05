@@ -1,4 +1,5 @@
 defmodule FileServer.Operations do
+  import Server.Items
   def reset_dir(path) do
     # Clear all entries
     Server.Items.delete_all(path)
@@ -14,7 +15,7 @@ defmodule FileServer.Operations do
 
   def new_file(file_path, filename, folder) do
     case File.exists?(FileServer.from_root(file_path)) do
-      true -> {:ok, process({:file, file_path, filename}, folder)}
+      true -> {:ok, process({:file, file_path, filename}, folder) |> create_item()}
       _ -> {:error}
     end
   end
