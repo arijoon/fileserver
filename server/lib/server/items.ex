@@ -8,6 +8,8 @@ defmodule Server.Items do
 
   alias Server.Items.Item
 
+  @chunk_size 1_000
+
   @doc """
   Returns the list of items.
 
@@ -48,12 +50,14 @@ defmodule Server.Items do
     Repo.all(q)
   end
 
-  def user_contrib(path) do
-    like_seg = "#{path}%"
+  def user_contrib(path, limit \\ 5) do
+    like_seg = "#{path}/%"
     q = from i in Item,
-    where: like(i.path, ^like_seg),
+    where: like(i.path, ^like_seg) or i.path == ^path,
     group_by: i.user,
-    select: {i.user, count(i.id)}
+    select: {i.user, count(i.id)},
+    order_by: [desc: count(i.id)],
+    limit: ^limit
 
     Repo.all(q)
   end
@@ -74,6 +78,21 @@ defmodule Server.Items do
     %Item{}
     |> Item.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def add_all(items) do
+    items
+     |> Enum.map(&(Item.changeset(%Item{}, &1)))
+     |> Enum.chunk_every(@chunk_size)
+     |> Enum.each(fn chunk ->
+        items_toadd = chunk
+        |> Enum.map(&Server.RepoUtils.changeset_to_map/1)
+        |> Enum.map(&Server.RepoUtils.add_timestamps/1)
+
+        Ecto.Multi.new()
+        |> Ecto.Multi.insert_all(:insert_all, Item, items_toadd)
+        |> Repo.transaction()
+     end)
   end
 
   @doc """
@@ -111,8 +130,9 @@ defmodule Server.Items do
   end
 
   def delete_all(path) do
-    like_seg = "#{path}%"
-    query = from i in Item, where: like(i.path, ^like_seg)
+    like_seg = "#{path}/%"
+    query = from i in Item,
+    where: like(i.path, ^like_seg) or i.path == ^path
     Repo.delete_all(query)
   end
 
