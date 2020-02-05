@@ -28,7 +28,7 @@ defmodule FileServer.Operations do
         |> Enum.map(&process/1)
       end)
     end)
-    |> Enum.map(&Task.await(&1, 600_000))
+    |> await_all(600_000)
     |> List.flatten()
   end
 
@@ -37,6 +37,22 @@ defmodule FileServer.Operations do
       true -> process({:file, file_path, filename, folder}) |> create_item()
       _ -> {:error}
     end
+  end
+
+  def await_all(tasks, timeout \\ 5_000) do
+    tasks
+    |> Task.yield_many(timeout)
+    |> Enum.map(fn {task, result} ->
+      case result do
+        nil ->
+          Task.shutdown(task, :brutal_kill)
+          exit(:timeout)
+        {:exit, reason} ->
+          exit(reason)
+        {:ok, result} ->
+          result
+      end
+    end)
   end
 
   defp process({:file, file_path, filename, folder}) do
