@@ -20,7 +20,12 @@ defmodule ServerWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", ServerWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", ServerWeb do
+    pipe_through :api
+
+    get "/items/search/:hash", ItemController, :search
+    post "/items", ItemController, :create
+    post "/items/stats", ItemController, :stats
+    post "/items/hash_dir", ItemController, :hash_dir
+  end
 end
