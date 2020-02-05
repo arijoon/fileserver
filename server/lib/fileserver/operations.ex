@@ -28,7 +28,7 @@ defmodule FileServer.Operations do
         |> Enum.map(&process/1)
       end)
     end)
-    |> Enum.map(&Task.await(&1, 10_000))
+    |> Enum.map(&Task.await(&1, 600_000))
     |> List.flatten()
   end
 
