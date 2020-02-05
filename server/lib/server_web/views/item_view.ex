@@ -23,6 +23,7 @@ defmodule ServerWeb.ItemView do
     %{id: item.id,
       path: item.path,
       filename: item.filename,
+      hash: item.hash,
       user: item.user,
       added: item.added}
   end

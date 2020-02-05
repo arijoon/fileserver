@@ -15,7 +15,7 @@ defmodule FileServer.Operations do
 
   def new_file(file_path, filename, folder) do
     case File.exists?(FileServer.from_root(file_path)) do
-      true -> {:ok, process({:file, file_path, filename}, folder) |> create_item()}
+      true -> process({:file, file_path, filename}, folder) |> create_item()
       _ -> {:error}
     end
   end
