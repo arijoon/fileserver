@@ -1,0 +1,34 @@
+version: '3'
+services:
+  phoenix:
+    build:
+      context: .
+    environment:
+      ROOT_PATH: /assets/images
+      DATABASE_URL: ecto://postgres:postgres@db/fileserver_prod
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: fileserver_prod
+      PGPORT: 5432
+      PORT: 5020
+      PGHOST: db
+    ports:
+      # Mapping the port to make the Phoenix app accessible outside of the container
+      - "5020:5020"
+    depends_on:
+      - db
+    volumes:
+      - /home/pi/prod/discord/assets/images/randompic:/assets/images
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      # Set a path where Postgres should store the data
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+# Define the volumes
+volumes:
+  pgdata:
