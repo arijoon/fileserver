@@ -36,6 +36,27 @@ defmodule Server.Items do
 
   """
   def get_item!(id), do: Repo.get!(Item, id)
+  def get_item!(path, filename) do
+    q= from i in Item,
+      where: i.path == ^path and i.filename == ^filename
+    Repo.one!(q)
+  end
+
+  def get_by_hash(hash) do
+    q = from i in Item,
+      where: i.hash == ^hash
+    Repo.all(q)
+  end
+
+  def user_contrib(path) do
+    like_seg = "#{path}%"
+    q = from i in Item,
+    where: like(i.path, ^like_seg),
+    group_by: i.user,
+    select: {i.user, count(i.id)}
+
+    Repo.all(q)
+  end
 
   @doc """
   Creates a item.
@@ -87,6 +108,12 @@ defmodule Server.Items do
   """
   def delete_item(%Item{} = item) do
     Repo.delete(item)
+  end
+
+  def delete_all(path) do
+    like_seg = "#{path}%"
+    query = from i in Item, where: like(i.path, ^like_seg)
+    Repo.delete_all(query)
   end
 
   @doc """

@@ -15,7 +15,7 @@ defmodule ServerWeb.ItemController do
     with {:ok, %Item{} = item} <- Items.create_item(item_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", Routes.item_path(conn, :show, item))
+      # |> put_resp_header("location", Routes.item_path(conn, :show, item))
       |> render("show.json", item: item)
     end
   end

@@ -5,6 +5,7 @@ defmodule Server.Repo.Migrations.CreateItems do
     create table(:items) do
       add :path, :string, null: false
       add :filename, :string, null: false
+      add :hash, :string, null: false
       add :user, :string, null: false
       add :added, :utc_datetime, null: false
 
@@ -13,6 +14,7 @@ defmodule Server.Repo.Migrations.CreateItems do
 
     create index(:items, [:path])
     create index(:items, [:filename])
+    create index(:items, [:hash])
     create index(:items, [:user])
     create index(:items, [:path, :filename], unique: true)
   end
