@@ -129,6 +129,7 @@ defmodule Server.Items do
     Repo.delete(item)
   end
 
+  def delete_all(""), do: Repo.delete_all(Item)
   def delete_all(path) do
     like_seg = "#{path}/%"
     query = from i in Item,
