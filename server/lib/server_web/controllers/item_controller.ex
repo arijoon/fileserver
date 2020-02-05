@@ -31,8 +31,10 @@ defmodule ServerWeb.ItemController do
   end
 
   def hash_dir(conn, %{"path" => path}) do
-    sanitize_path(path)
-    |> Operations.reset_dir()
+    Task.start(fn ->
+      sanitize_path(path)
+      |> Operations.reset_dir()
+    end)
 
     send_resp(conn, :no_content, "")
   end
