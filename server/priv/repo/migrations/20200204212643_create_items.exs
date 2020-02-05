@@ -14,5 +14,6 @@ defmodule Server.Repo.Migrations.CreateItems do
     create index(:items, [:path])
     create index(:items, [:filename])
     create index(:items, [:user])
+    create index(:items, [:path, :filename], unique: true)
   end
 end
