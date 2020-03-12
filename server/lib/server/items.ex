@@ -9,6 +9,7 @@ defmodule Server.Items do
   alias Server.Items.Item
 
   @chunk_size 1_000
+  @admin Application.get_env(:server, :admin)
 
   @doc """
   Gets a single item.
@@ -32,10 +33,11 @@ defmodule Server.Items do
   end
 
   def get_by_hash(hash) do
-    q = from i in Item,
-      where: i.hash == ^hash
-    Repo.all(q)
+    hash_search(hash)
+    |> Repo.all()
   end
+
+  defp hash_search(hash), do: from i in Item, where: i.hash == ^hash
 
   def count_items(path) do
     q = from i in filter_path(path),
@@ -106,6 +108,27 @@ defmodule Server.Items do
   """
   def delete_item(%Item{} = item) do
     Repo.delete(item)
+  end
+
+  @doc """
+  Deletes the record and file itself that match hash and user
+  Admin is exception, it'll delete everything matching hash
+  """
+  def delete_by(:hash, hash, username) do
+    query = hash_search(hash)
+    query = if username == @admin do
+      query
+    else
+      where(query, [i], i.user == ^username)
+    end
+
+    Repo.all(query)
+    |> Enum.each(fn item ->
+        FileServer.delete_file(item.path, item.filename)
+      end)
+
+    {count, _} = Repo.delete_all(query)
+    count
   end
 
   def delete_all(""), do: Repo.delete_all(Item)

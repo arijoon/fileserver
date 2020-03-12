@@ -19,6 +19,12 @@ defmodule ServerWeb.ItemView do
     %{data: render_one(item, ItemView, "item.json")}
   end
 
+  def render("delete.json", %{count: count}) do
+    %{data: %{
+      count: count
+    }}
+  end
+
   def render("item.json", %{item: item}) do
     %{id: item.id,
       path: item.path,

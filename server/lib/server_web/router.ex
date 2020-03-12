@@ -24,6 +24,7 @@ defmodule ServerWeb.Router do
     pipe_through :api
 
     get "/items/search/:hash", ItemController, :search
+    post "/items/delete", ItemController, :delete
     post "/items", ItemController, :create
     post "/items/stats", ItemController, :stats
     post "/items/hash_dir", ItemController, :hash_dir

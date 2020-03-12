@@ -26,7 +26,8 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :server,
-  root_path: "Enter path for base"
+  root_path: "Enter path for base",
+  admin: "Arijoon"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

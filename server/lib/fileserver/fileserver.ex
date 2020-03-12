@@ -1,4 +1,6 @@
 defmodule FileServer do
+  import Logger
+
   @root_path Application.get_env(:server, :root_path)
 
   def crawl(path, filename \\ "") do
@@ -23,6 +25,13 @@ defmodule FileServer do
     |> Base.encode16
   end
 
+  def delete_file(path, filename) do
+    Path.join(path, filename)
+    |> from_root()
+    |> log_action("delete")
+    |> File.rm!()
+  end
+
   def from_root(path) do
     Path.join(@root_path, path)
   end
@@ -36,5 +45,10 @@ defmodule FileServer do
   def to_datetime({{y, m, d}, {h, mm, ss}}) do
     %DateTime{year: y, month: m, day: d, hour: h, minute: mm, second: ss,
       utc_offset: 0, std_offset: 0, zone_abbr: "UTC", time_zone: "Etc/UTC"}
+  end
+
+  def log_action(path, action) do
+    info("#{action} #{path}")
+    path
   end
 end
