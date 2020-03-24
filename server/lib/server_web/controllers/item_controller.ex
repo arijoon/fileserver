@@ -16,6 +16,22 @@ defmodule ServerWeb.ItemController do
     end
   end
 
+  def create(conn, %{"items" => items}) when is_list(items) do
+    result = items
+    |> Enum.map(fn %{"path" => path, "filename" => filename, "folder" => folder} ->
+      with {:ok, %Item{} = item} <- Operations.new_file(path, filename, folder) do
+        item
+      else
+        _ -> nil
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+
+    conn
+    |> put_status(:created)
+    |> render("index.json", items: result)
+  end
+
   def search(conn, %{"hash" => hash}) do
     items = Items.get_by_hash(hash)
     render(conn, "index.json", items: items)
