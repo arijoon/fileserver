@@ -10,12 +10,14 @@ defmodule FileServer do
   end
 
   defp crawl_sub({:ok, files}, path, _) do
-    {:folder, path, files |> Enum.map(&(Path.join(path, &1) |> crawl(&1)))}
+    {:folder, path, files |> Enum.reject(&filter_file/1) |> Enum.map(&(Path.join(path, &1) |> crawl(&1)))}
   end
 
   defp crawl_sub({:error, _}, path, filename) do
     {:file, path, filename}
   end
+
+  defp filter_file(file), do: String.starts_with?(file, ".")
 
   def hash_file(path) do
     from_root(path)
