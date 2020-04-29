@@ -144,6 +144,18 @@ defmodule Server.Items do
     where: like(i.path, ^like_seg) or i.path == ^path
   end
 
+  def path_search(str) do
+    str = "%/%#{str}%"
+    (from i in Item,
+    where: like(i.path, ^str),
+    order_by: i.path,
+    limit: 15,
+    group_by: i.path,
+    select: i.path
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking item changes.
 

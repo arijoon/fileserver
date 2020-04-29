@@ -11,6 +11,14 @@ defmodule ServerWeb.ItemView do
     }
   end
 
+  def render("paths.json", %{items: items}) do
+    %{
+      data: %{
+        paths: items
+      }
+    }
+  end
+
   def render("index.json", %{items: items}) do
     %{data: render_many(items, ItemView, "item.json")}
   end

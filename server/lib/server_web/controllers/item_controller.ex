@@ -37,6 +37,11 @@ defmodule ServerWeb.ItemController do
     render(conn, "index.json", items: items)
   end
 
+  def path_search(conn, %{"query" => query}) do
+    items = Items.path_search(query)
+    render(conn, "paths.json", items: items)
+  end
+
   def delete(conn, %{"hash" => hash, "user" => username}) do
     count = Items.delete_by(:hash, hash, username)
     render(conn, "delete.json", count: count)
