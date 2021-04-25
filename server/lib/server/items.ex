@@ -156,6 +156,22 @@ defmodule Server.Items do
     |> Repo.all()
   end
 
+  def rand_from(lst) when is_list(lst) do
+    query = lst
+    |> Enum.reduce(false, fn filter, query ->
+      str = "#{filter}/%"
+      dynamic([i], like(i.path, ^str) or i.path == ^filter or ^query)
+    end)
+
+    (from i in Item,
+    where: ^query,
+    order_by: fragment("RANDOM()"),
+    limit: 1,
+    select: i
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking item changes.
 

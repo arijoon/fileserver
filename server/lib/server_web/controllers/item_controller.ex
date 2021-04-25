@@ -17,15 +17,16 @@ defmodule ServerWeb.ItemController do
   end
 
   def create(conn, %{"items" => items}) when is_list(items) do
-    result = items
-    |> Enum.map(fn %{"path" => path, "filename" => filename, "folder" => folder} ->
-      with {:ok, %Item{} = item} <- Operations.new_file(path, filename, folder) do
-        item
-      else
-        _ -> nil
-      end
-    end)
-    |> Enum.reject(&is_nil/1)
+    result =
+      items
+      |> Enum.map(fn %{"path" => path, "filename" => filename, "folder" => folder} ->
+        with {:ok, %Item{} = item} <- Operations.new_file(path, filename, folder) do
+          item
+        else
+          _ -> nil
+        end
+      end)
+      |> Enum.reject(&is_nil/1)
 
     conn
     |> put_status(:created)
@@ -40,6 +41,15 @@ defmodule ServerWeb.ItemController do
   def path_search(conn, %{"query" => query}) do
     items = Items.path_search(query)
     render(conn, "paths.json", items: items)
+  end
+
+  def rand_search(conn, %{"query" => query}) do
+    items =
+      query
+      |> String.split(",", trim: true)
+      |> Items.rand_from()
+
+    render(conn, "index.json", items: items)
   end
 
   def delete(conn, %{"hash" => hash, "user" => username}) do
