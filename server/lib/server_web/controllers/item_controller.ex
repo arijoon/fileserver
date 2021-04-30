@@ -46,7 +46,7 @@ defmodule ServerWeb.ItemController do
   def rand_search(conn, %{"query" => query}) do
     items =
       query
-      |> String.split(",", trim: true)
+      |> str_to_lst()
       |> Items.rand_from()
 
     render(conn, "index.json", items: items)
@@ -58,8 +58,9 @@ defmodule ServerWeb.ItemController do
   end
 
   def stats(conn, %{"path" => path}) do
-    user_contrib = Items.user_contrib(path)
-    count = Items.count_items(path)
+    paths = str_to_lst(path)
+    user_contrib = Items.user_contrib(paths)
+    count = Items.count_items(paths)
 
     conn
     |> put_view(ItemView)
@@ -73,6 +74,10 @@ defmodule ServerWeb.ItemController do
     end)
 
     send_resp(conn, :no_content, "")
+  end
+
+  defp str_to_lst(str) do
+    String.split(str, ",", trim: true)
   end
 
   defp sanitize_path(path) do

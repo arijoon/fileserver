@@ -138,6 +138,15 @@ defmodule Server.Items do
   end
 
   def filter_path(""), do: Item
+  def filter_path(path) when is_list(path) do
+    query = path
+    |> Enum.reduce(false, fn filter, query ->
+      str = "#{filter}/%"
+      dynamic([i], like(i.path, ^str) or i.path == ^filter or ^query)
+    end)
+    from i in Item,
+    where: ^query
+  end
   def filter_path(path) do
     like_seg = "#{path}/%"
     from i in Item,
@@ -157,14 +166,7 @@ defmodule Server.Items do
   end
 
   def rand_from(lst) when is_list(lst) do
-    query = lst
-    |> Enum.reduce(false, fn filter, query ->
-      str = "#{filter}/%"
-      dynamic([i], like(i.path, ^str) or i.path == ^filter or ^query)
-    end)
-
-    (from i in Item,
-    where: ^query,
+    (from i in filter_path(lst),
     order_by: fragment("RANDOM()"),
     limit: 1,
     select: i
