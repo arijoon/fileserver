@@ -20,6 +20,7 @@ services:
       - db
     volumes:
       - /home/pi/prod/discord/assets/images/randompic:/assets/images
+    restart: always
   db:
     image: postgres:9.6
     environment:
@@ -30,6 +31,7 @@ services:
     restart: always
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: always
 # Define the volumes
 volumes:
   pgdata:

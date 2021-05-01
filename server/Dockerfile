@@ -1,4 +1,4 @@
-FROM elixir:alpine
+FROM elixir:1.6-alpine
 
 RUN apk add --update postgresql-client
 RUN mix local.hex --force && mix local.rebar --force
