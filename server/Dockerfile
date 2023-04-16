@@ -1,4 +1,4 @@
-FROM elixir:1.12-alpine AS builder
+FROM elixir:alpine AS builder
 
 ENV MIX_ENV=prod \
     APP_NAME=server \
@@ -25,7 +25,7 @@ RUN \
   mkdir -p /opt/built && \
   cp -rf _build/${MIX_ENV}/rel/${APP_NAME} /opt/built
 
-FROM alpine:3.16.2
+FROM elixir:alpine
 RUN apk add --update postgresql-client bash openssl-dev
 
 ENV APP_NAME=server
