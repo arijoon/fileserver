@@ -1,7 +1,9 @@
 FROM elixir:1.12-alpine AS builder
 
 ENV MIX_ENV=prod \
-    APP_NAME=server
+    APP_NAME=server \
+    ROOT_PATH="/assets/images"
+    DATABASE_URL="ecto://postgres:postgres@db/fileserver_prod"
 
 WORKDIR /opt/app
 
@@ -24,7 +26,7 @@ RUN \
   cp -rf _build/${MIX_ENV}/rel/${APP_NAME} /opt/built
 
 FROM alpine:3.16.2
-RUN apk add --update postgresql-client bash
+RUN apk add --update postgresql-client bash openssl-dev
 
 ENV APP_NAME=server
 

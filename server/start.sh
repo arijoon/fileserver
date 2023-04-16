@@ -15,6 +15,6 @@ app=/opt/app/${APP_NAME}/bin/${APP_NAME}
   # echo "Database $PGDATABASE created."
 # fi
 
-$app eval StockTracker.Release.migrate
+$app eval FileServer.Release.migrate
 
 exec $app start
