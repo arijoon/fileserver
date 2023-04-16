@@ -1,1 +1,1 @@
-server/config/prod.secret.exs
+server/config/*.secret.exs

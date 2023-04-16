@@ -2,7 +2,7 @@ FROM elixir:1.12-alpine AS builder
 
 ENV MIX_ENV=prod \
     APP_NAME=server \
-    ROOT_PATH="/assets/images"
+    ROOT_PATH="/assets/images" \
     DATABASE_URL="ecto://postgres:postgres@db/fileserver_prod"
 
 WORKDIR /opt/app
