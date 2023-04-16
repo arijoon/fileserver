@@ -136,6 +136,17 @@ defmodule Server.Items do
     |> Repo.all()
   end
 
+  def fuzzy_search(str) do
+    (from i in Item,
+    where: fragment("SIMILARITY(path, ?) > 0.1", ^str),
+    order_by: fragment("SIMILARITY(path, ?) DESC", ^str),
+    group_by: i.path,
+    limit: 5,
+    select: i.path
+    )
+    |> Repo.all()
+  end
+
   def rand_from(lst) when is_list(lst) do
     (from i in filter_path(lst),
     order_by: fragment("RANDOM()"),

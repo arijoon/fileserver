@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 while ! pg_isready -q -h $PGHOST -p $PGPORT -U $PGUSER
 do
@@ -6,13 +6,15 @@ do
   sleep 2
 done
 
+app=/opt/app/${APP_NAME}/bin/${APP_NAME}
+
 # Create database if it doesn't exist.
-if [[ -z `psql -Atqc "\\list $PGDATABASE"` ]]; then
-  echo "Database $PGDATABASE does not exist. Creating..."
-  mix ecto.create
-  echo "Database $PGDATABASE created."
-fi
+# if [[ -z `psql -Atqc "\\list $PGDATABASE"` ]]; then
+  # echo "Database $PGDATABASE does not exist. Creating..."
+#
+  # echo "Database $PGDATABASE created."
+# fi
 
-mix ecto.migrate
+$app eval StockTracker.Release.migrate
 
-exec mix phx.server
+exec $app start

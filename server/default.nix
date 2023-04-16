@@ -3,7 +3,9 @@
 }:
 
 with pkgs;
-
+let
+  elixir = beam.packages.erlangR23.elixir_1_12;
+in
 buildEnv {
   name = "builder";
   paths = [

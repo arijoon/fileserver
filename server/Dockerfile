@@ -1,18 +1,36 @@
-FROM elixir:alpine
+FROM elixir:1.12-alpine AS builder
 
-RUN apk add --update postgresql-client
+ENV MIX_ENV=prod \
+    APP_NAME=server
+
+WORKDIR /opt/app
+
+# COPY shell.nix default.nix ./
+# COPY nix ./
+
+# RUN nix-shell --command "echo loaded deps"
+
+COPY mix.exs mix.lock ./
+
 RUN mix local.hex --force && mix local.rebar --force
-RUN mkdir /app
-WORKDIR /app
-COPY config ./config
-COPY lib ./lib
-COPY priv ./priv
-COPY mix.exs .
-COPY mix.lock .
+RUN mix deps.get && mix deps.compile
+
+COPY . .
+
+RUN mix compile && mix release
+
+RUN \
+  mkdir -p /opt/built && \
+  cp -rf _build/${MIX_ENV}/rel/${APP_NAME} /opt/built
+
+FROM alpine:3.16.2
+RUN apk add --update postgresql-client bash
+
+ENV APP_NAME=server
+
+WORKDIR /opt/app
+
 COPY start.sh .
+COPY --from=builder /opt/built .
 
-RUN mix deps.get
-RUN mix do compile
-RUN mix phx.digest
-
-CMD ["/app/start.sh"]
+CMD ["/bin/bash", "/opt/app/start.sh"]
