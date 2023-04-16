@@ -136,6 +136,17 @@ defmodule Server.Items do
     |> Repo.all()
   end
 
+  def path_search_v2(str) do
+    (from i in Item,
+    where: fragment("path_vec @@ to_tsquery(?)", ^str),
+    order_by: fragment("SIMILARITY(path, ?) DESC", ^str),
+    limit: 15,
+    group_by: i.path,
+    select: i.path
+    )
+    |> Repo.all()
+  end
+
   def fuzzy_search(str) do
     (from i in Item,
     where: fragment("SIMILARITY(path, ?) > 0.1", ^str),

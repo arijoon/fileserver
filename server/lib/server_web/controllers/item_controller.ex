@@ -43,6 +43,11 @@ defmodule ServerWeb.ItemController do
     render(conn, "paths.json", items: items)
   end
 
+  def path_search_v2(conn, %{"query" => query}) do
+    items = Items.path_search_v2(query)
+    render(conn, "paths.json", items: items)
+  end
+
   def rand_search(conn, %{"query" => query}) do
     items =
       query
