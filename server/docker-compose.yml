@@ -5,6 +5,7 @@ services:
       context: .
     environment:
       MIX_ENV: prod
+      APP_NAME: sever
       ROOT_PATH: /assets/images
       DATABASE_URL: ecto://postgres:postgres@db/fileserver_prod
       PGUSER: postgres

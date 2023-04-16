@@ -10,3 +10,4 @@ README*
 test/
 priv/static/
 .envrc
+pgdata/
