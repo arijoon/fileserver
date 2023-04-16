@@ -20,16 +20,18 @@ services:
       - db
     volumes:
       - /home/pi/prod/discord/assets/images/randompic:/assets/images
+    restart: always
   db:
-    image: postgres:9.6
+    image: postgres:15.2
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       # Set a path where Postgres should store the data
       PGDATA: /var/lib/postgresql/data/pgdata
     restart: always
+    ports:
+      - "5099:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-# Define the volumes
-volumes:
-  pgdata:
+      - /home/pi/prod/fileserver/server/pgdata:/var/lib/postgresql/data
+    restart: always
+
