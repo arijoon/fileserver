@@ -48,11 +48,11 @@ defmodule ServerWeb.ItemController do
     render(conn, "paths.json", items: items)
   end
 
-  def rand_search(conn, %{"query" => query}) do
+  def rand_search(conn, %{"query" => query, "mints" => mints, "maxts" => maxts}) do
     items =
       query
       |> str_to_lst()
-      |> Items.rand_from()
+      |> Items.rand_from(mints, maxts)
 
     render(conn, "index.json", items: items)
   end

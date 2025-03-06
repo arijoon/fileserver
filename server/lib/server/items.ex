@@ -158,9 +158,12 @@ defmodule Server.Items do
     |> Repo.all()
   end
 
-  def rand_from(lst) when is_list(lst) do
+  def rand_from(lst, mints, maxts) when is_list(lst) do
+    {:ok, min} = DateTime.from_unix(String.to_integer(mints))
+    {:ok, max} = DateTime.from_unix(String.to_integer(maxts))
     (from i in filter_path(lst),
     order_by: fragment("RANDOM()"),
+    where: i.added >= ^min and i.added <= ^max,
     limit: 1,
     select: i
     )

@@ -27,7 +27,7 @@ defmodule ServerWeb.Router do
     get "/items/path-search/:query", ItemController, :path_search
     get "/items/path-search-v2/:query", ItemController, :path_search_v2
     get "/items/fuzzy-search/:query", ItemController, :fuzzy_search
-    get "/items/rand-search/:query", ItemController, :rand_search
+    get "/items/rand-search/:mints/:maxts/:query", ItemController, :rand_search
     post "/items/delete", ItemController, :delete
     post "/items", ItemController, :create
     post "/items/stats", ItemController, :stats
